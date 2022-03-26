@@ -51,6 +51,7 @@ class Dev(Configuration):
       'crispy_forms',
       'crispy_bootstrap5',
       'debug_toolbar',
+      'blango_auth',
   ]
 
   MIDDLEWARE = [
@@ -95,7 +96,8 @@ class Dev(Configuration):
   # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
   DATABASES = values.DatabaseURLValue(f"sqlite:///{BASE_DIR}/db.sqlite3")
-
+  
+  AUTH_USER_MODEL = 'blango_auth.User'
 
   # Password validation
   # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators

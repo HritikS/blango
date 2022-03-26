@@ -5,6 +5,7 @@ from .models import *
 
 admin.site.register(Tag)
 admin.site.register(Comment)
+admin.site.register(AuthorProfile)
 
 class PostAdmin(admin.ModelAdmin):
   prepopulated_fields = {"slug": ("title", )}
