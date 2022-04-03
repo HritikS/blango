@@ -18,6 +18,11 @@ class PostSerializer(serializers.ModelSerializer):
     fields = '__all__'
     readonly = ['modified_at', 'created_at']
 
+class TagSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = Tag
+    fields = '__all__'
+
 
 class UserSerializer(serializers.ModelSerializer):
   class Meta:
