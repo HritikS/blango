@@ -14,12 +14,15 @@ from rest_framework.exceptions import PermissionDenied
 
 from .permissions import *
 from .serializers import *
+from .filters import *
 
 from blog.models import *
 from blango_auth.models import User
 
 
 class PostViewSet(viewsets.ModelViewSet):
+    ordering_fields = ["published_at", "author", "title", "slug"]
+    filterset_class = PostFilterSet
     permission_classes = [AuthorModifyOrReadOnly | IsAdminUserForObject]
     queryset = Post.objects.all()
 
@@ -58,7 +61,14 @@ class PostViewSet(viewsets.ModelViewSet):
     def mine(self, request):
         if request.user.is_anonymous:
             raise PermissionDenied("Access Denied")
-        return Response(PostSerializer(self.get_queryset().filter(author=self.user), many=True, context={'request': request}).data)
+
+        posts = self.get_queryset().filter(author=request.user)
+        page = self.paginate_queryset(posts)
+
+        if page:
+            return self.get_paginated_response(PostSerializer(page, many=True, context={'request': request}).data)
+
+        return Response(PostSerializer(posts, many=True, context={'request': request}).data)
 
 class UserDetail(generics.RetrieveAPIView):
     lookup_field = 'email'
@@ -84,5 +94,14 @@ class TagViewSet(viewsets.ModelViewSet):
 
     @action(methods=['get'], detail=True, name='Posts with the Tag')
     def posts(self, request, pk=None):
-        return Response(PostSerializer(self.get_object().posts, many=True, 
-                    context={"request": request}).data)
+        tag = self.get_object()
+        page = self.paginate_queryset(tag.posts.all())
+        if page is not None:
+            post_serializer = PostSerializer(
+                page, many=True, context={"request": request}
+            )
+            return self.get_paginated_response(post_serializer.data)
+        post_serializer = PostSerializer(
+            tag.posts, many=True, context={"request": request}
+        )
+        return Response(post_serializer.data)
