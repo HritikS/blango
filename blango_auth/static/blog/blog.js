@@ -1,14 +1,25 @@
-const lazyAdd = function (a, b) {
-  const doAdd = (resolve, reject) => {
-    if (typeof a !== "number" || typeof b !== "number") {
-      reject("a and b must both be numbers")
-    } else {
-      const sum = a + b
-      resolve(sum)
-    }
+class ClickButton extends React.Component {
+  state = {
+    wasClicked: false
   }
 
-  return new Promise(doAdd)
+  render () {
+    return React.createElement(
+      'button',
+      {
+        className: 'btn btn-primary mt-2',
+        onClick: () => {
+          this.setState(
+            {wasClicked: true}
+          )
+        }
+      },
+      this.state.wasClicked ? "Clicked!" : "Click Me"
+    )
+  }
 }
 
-lazyAdd(1, '2').then(res => console.log(res), err => console.log(err))
+ReactDOM.render(
+  React.createElement(ClickButton),
+  document.getElementById('react_root')
+)
